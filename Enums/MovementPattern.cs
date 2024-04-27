@@ -1,6 +1,6 @@
 ﻿namespace Workout_API.Enums
 {
-    public enum MovementPatterns
+    public enum MovementPattern
     {
         Push, 
         Pull, 
