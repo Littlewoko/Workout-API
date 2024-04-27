@@ -26,17 +26,20 @@ namespace Workout_API.Models
         public HashSet<BodyPart> TargetedBodyparts { get; set; }
         public MovementPattern MovementPattern { get; set; }
 
-        public Movement(int id, string name, string description, Dictionary<int, Set>? warmupSets, Dictionary<int, Set>? workingSets, HashSet<BodyPart>? bodyparts, MovementPattern movementPattern)
+        public int OrderStep { get; set; }
+
+        public Movement(int id, string name, string description, Dictionary<int, Set>? warmupSets, Dictionary<int, Set>? workingSets, HashSet<BodyPart>? bodyparts, MovementPattern movementPattern, int orderStep = 0)
         {
             this.Id = id;
             this.Name = name;
             this.Description = description;
             this.MovementPattern = movementPattern;
 
-            if(warmupSets != null)
+            if (warmupSets != null)
             {
                 this.WarmupSets = warmupSets;
-            } else
+            }
+            else
             {
                 this.WarmupSets = new Dictionary<int, Set>();
             }
@@ -50,13 +53,16 @@ namespace Workout_API.Models
                 this.WorkingSets = new Dictionary<int, Set>();
             }
 
-            if(bodyparts != null)
+            if (bodyparts != null)
             {
                 this.TargetedBodyparts = bodyparts;
-            } else
+            }
+            else
             {
                 this.TargetedBodyparts = new HashSet<BodyPart>();
             }
+
+            OrderStep = orderStep;
         }
 
         public void AddWarmupSet(Set warmup)
@@ -88,9 +94,5 @@ namespace Workout_API.Models
         {
             this.TargetedBodyparts.Remove(bodypart);
         }
-
-
-
-
     }
 }
