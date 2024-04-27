@@ -12,6 +12,7 @@
     /// </summary>
     public class Set
     {
+        public int Id { get; set; }
         public int? Reps { get; set; }
 
         /// <summary>
@@ -37,19 +38,25 @@
 
         /// <summary>
         /// 
+        /// Describes the relative order of this set within its grouping
         /// 
-        /// 
+        /// </summary>
+        public int OrderStep { get; set; }
+
+        /// <summary>
         /// </summary>
         /// <param name="reps">number completed</param>
         /// <param name="weight">in kg</param>
         /// <param name="distance">in meters</param>
         /// <param name="time">in ms</param>
-        public Set(int? reps, int? weight, float? distance, int? time) 
+        public Set(int id, int? reps, int? weight, float? distance, int? time, int orderStep = 0) 
         { 
+            this.Id = id;
             this.Reps = reps;
             this.Weight = weight;
             this.Distance = distance;
             this.Time = time;
+            this.OrderStep = orderStep; 
         }
     }
 }
