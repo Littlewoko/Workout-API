@@ -1,18 +1,22 @@
-﻿namespace Workout_API.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Workout_API.Models
 {
     /// <summary>
     /// 
     /// A single completed set, a set is a single instance of completing
-    /// some movement. 
+    /// some movement. A working set is one of the main sets completed as part of
+    /// a workout and is considered for progress tracking.
     /// 
     /// Example: A group of reps done on after another
     /// Example: A single instance of distance moved during a run or walk
     /// Example: The time to complete a given movement such as a Plank
     /// 
     /// </summary>
-    public class Set
+    public class WorkingSet
     {
         public int Id { get; set; }
+
         public int? Reps { get; set; }
 
         /// <summary>
@@ -43,20 +47,7 @@
         /// </summary>
         public int OrderStep { get; set; }
 
-        /// <summary>
-        /// </summary>
-        /// <param name="reps">number completed</param>
-        /// <param name="weight">in kg</param>
-        /// <param name="distance">in meters</param>
-        /// <param name="time">in ms</param>
-        public Set(int id, int? reps, int? weight, float? distance, int? time, int orderStep = 0) 
-        { 
-            this.Id = id;
-            this.Reps = reps;
-            this.Weight = weight;
-            this.Distance = distance;
-            this.Time = time;
-            this.OrderStep = orderStep; 
-        }
+        public int MovementId { get; set; }
+        public Movement Movement { get; set; }
     }
 }
