@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Workout_API.Models
 {
@@ -16,6 +17,7 @@ namespace Workout_API.Models
     /// </summary>
     public class WarmupSet
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
         

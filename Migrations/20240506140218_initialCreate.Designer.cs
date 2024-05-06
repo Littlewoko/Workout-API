@@ -12,7 +12,7 @@ using Workout_API.DBContexts;
 namespace Workout_API.Migrations
 {
     [DbContext(typeof(DBContext))]
-    [Migration("20240506123731_initialCreate")]
+    [Migration("20240506140218_initialCreate")]
     partial class initialCreate
     {
         /// <inheritdoc />
@@ -33,14 +33,13 @@ namespace Workout_API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int?>("MovementId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
+                    b.HasKey("Id", "Name");
 
                     b.HasIndex("MovementId");
 
@@ -62,6 +61,10 @@ namespace Workout_API.Migrations
                     b.Property<int>("MovementPatternId")
                         .HasColumnType("int");
 
+                    b.Property<string>("MovementPatternName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -74,9 +77,9 @@ namespace Workout_API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MovementPatternId");
-
                     b.HasIndex("WorkoutId");
+
+                    b.HasIndex("MovementPatternId", "MovementPatternName");
 
                     b.ToTable("Movements");
                 });
@@ -90,10 +93,9 @@ namespace Workout_API.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id", "Name");
 
                     b.ToTable("MovementsPatterns");
                 });
@@ -107,14 +109,13 @@ namespace Workout_API.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id", "Email");
 
                     b.ToTable("Users");
                 });
@@ -196,12 +197,15 @@ namespace Workout_API.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UserEmail")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId", "UserEmail");
 
                     b.ToTable("Workouts");
                 });
@@ -215,15 +219,15 @@ namespace Workout_API.Migrations
 
             modelBuilder.Entity("Workout_API.Models.Movement", b =>
                 {
-                    b.HasOne("Workout_API.Models.MovementPattern", "MovementPattern")
-                        .WithMany()
-                        .HasForeignKey("MovementPatternId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Workout_API.Models.Workout", "Workout")
                         .WithMany("Movements")
                         .HasForeignKey("WorkoutId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Workout_API.Models.MovementPattern", "MovementPattern")
+                        .WithMany()
+                        .HasForeignKey("MovementPatternId", "MovementPatternName")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -258,9 +262,7 @@ namespace Workout_API.Migrations
                 {
                     b.HasOne("Workout_API.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId", "UserEmail");
 
                     b.Navigation("User");
                 });

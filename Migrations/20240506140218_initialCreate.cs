@@ -17,11 +17,11 @@ namespace Workout_API.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MovementsPatterns", x => x.Id);
+                    table.PrimaryKey("PK_MovementsPatterns", x => new { x.Id, x.Name });
                 });
 
             migrationBuilder.CreateTable(
@@ -30,12 +30,12 @@ namespace Workout_API.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_Users", x => new { x.Id, x.Email });
                 });
 
             migrationBuilder.CreateTable(
@@ -45,17 +45,17 @@ namespace Workout_API.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    UserEmail = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Workouts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Workouts_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_Workouts_Users_UserId_UserEmail",
+                        columns: x => new { x.UserId, x.UserEmail },
                         principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumns: new[] { "Id", "Email" });
                 });
 
             migrationBuilder.CreateTable(
@@ -67,6 +67,7 @@ namespace Workout_API.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     MovementPatternId = table.Column<int>(type: "int", nullable: false),
+                    MovementPatternName = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     OrderStep = table.Column<int>(type: "int", nullable: false),
                     WorkoutId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -74,10 +75,10 @@ namespace Workout_API.Migrations
                 {
                     table.PrimaryKey("PK_Movements", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Movements_MovementsPatterns_MovementPatternId",
-                        column: x => x.MovementPatternId,
+                        name: "FK_Movements_MovementsPatterns_MovementPatternId_MovementPatternName",
+                        columns: x => new { x.MovementPatternId, x.MovementPatternName },
                         principalTable: "MovementsPatterns",
-                        principalColumn: "Id",
+                        principalColumns: new[] { "Id", "Name" },
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Movements_Workouts_WorkoutId",
@@ -93,12 +94,12 @@ namespace Workout_API.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     MovementId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_BodyParts", x => x.Id);
+                    table.PrimaryKey("PK_BodyParts", x => new { x.Id, x.Name });
                     table.ForeignKey(
                         name: "FK_BodyParts_Movements_MovementId",
                         column: x => x.MovementId,
@@ -160,9 +161,9 @@ namespace Workout_API.Migrations
                 column: "MovementId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Movements_MovementPatternId",
+                name: "IX_Movements_MovementPatternId_MovementPatternName",
                 table: "Movements",
-                column: "MovementPatternId");
+                columns: new[] { "MovementPatternId", "MovementPatternName" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Movements_WorkoutId",
@@ -180,9 +181,9 @@ namespace Workout_API.Migrations
                 column: "MovementId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Workouts_UserId",
+                name: "IX_Workouts_UserId_UserEmail",
                 table: "Workouts",
-                column: "UserId");
+                columns: new[] { "UserId", "UserEmail" });
         }
 
         /// <inheritdoc />

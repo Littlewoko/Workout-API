@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 using Workout_API.DBContexts;
 using Workout_API.Models;
 
@@ -31,6 +33,24 @@ namespace Workout_API.Controllers
             {
                 return Ok(user);
             }
+        }
+
+        [HttpPost(Name = "CreateUser")]
+        public IActionResult CreateUser([FromBody] User newUser)
+        {
+            string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+            Regex validate = new Regex(emailPattern);
+            bool validEmail = validate.IsMatch(newUser.Email);
+
+            if(!validEmail)
+            {
+                return BadRequest("Invalid email provided for user");
+            }
+
+            _context.Users.Add(newUser);
+            _context.SaveChanges();
+
+            return CreatedAtRoute("GetUser", new { Email = newUser.Email }, newUser);
         }
     }
 }
