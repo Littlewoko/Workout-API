@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using Workout_API.DBContexts;
 
 namespace Workout_API
 {
@@ -13,6 +15,9 @@ namespace Workout_API
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            var connectionString = builder.Configuration.GetConnectionString("master");
+            builder.Services.AddDbContext<DBContext>(
+                options => options.UseSqlServer(connectionString));
 
             var app = builder.Build();
 
