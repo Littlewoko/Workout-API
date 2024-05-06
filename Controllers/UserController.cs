@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 using Workout_API.DBContexts;
 using Workout_API.Models;
@@ -26,10 +27,11 @@ namespace Workout_API.Controllers
                 user = _context.Users.Single(u => u.Email == Email);
             }
 
-            if(user == null)
+            if (user == null)
             {
                 return NotFound();
-            } else
+            }
+            else
             {
                 return Ok(user);
             }
@@ -42,7 +44,7 @@ namespace Workout_API.Controllers
             Regex validate = new Regex(emailPattern);
             bool validEmail = validate.IsMatch(newUser.Email);
 
-            if(!validEmail)
+            if (!validEmail)
             {
                 return BadRequest("Invalid email provided for user");
             }
@@ -51,6 +53,36 @@ namespace Workout_API.Controllers
             _context.SaveChanges();
 
             return CreatedAtRoute("GetUser", new { Email = newUser.Email }, newUser);
+        }
+
+        [HttpPost(Name = "DeleteUserByEmail")]
+        public IActionResult DeleteUser(string Email)
+        {
+            User user = _context.Users.Single(u => u.Email == Email);
+
+            if (user == null)
+            {
+                return Ok();
+            }
+
+            _context.Users.Remove(user);
+            _context.SaveChanges();
+            return Ok();
+        }
+
+        [HttpPost(Name = "DeleteUserById")]
+        public IActionResult DeleteUser(int Id)
+        {
+            User user = _context.Users.Single(u => u.Id == Id);
+
+            if (user == null)
+            {
+                return Ok();
+            }
+
+            _context.Users.Remove(user);
+            _context.SaveChanges();
+            return Ok();
         }
     }
 }
