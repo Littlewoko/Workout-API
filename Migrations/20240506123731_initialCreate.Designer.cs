@@ -12,8 +12,8 @@ using Workout_API.DBContexts;
 namespace Workout_API.Migrations
 {
     [DbContext(typeof(DBContext))]
-    [Migration("20240505141528_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240506123731_initialCreate")]
+    partial class initialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -98,6 +98,27 @@ namespace Workout_API.Migrations
                     b.ToTable("MovementsPatterns");
                 });
 
+            modelBuilder.Entity("Workout_API.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("Workout_API.Models.WarmupSet", b =>
                 {
                     b.Property<int>("Id")
@@ -175,7 +196,12 @@ namespace Workout_API.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Workouts");
                 });
@@ -226,6 +252,17 @@ namespace Workout_API.Migrations
                         .IsRequired();
 
                     b.Navigation("Movement");
+                });
+
+            modelBuilder.Entity("Workout_API.Models.Workout", b =>
+                {
+                    b.HasOne("Workout_API.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Workout_API.Models.Movement", b =>
