@@ -32,7 +32,7 @@ namespace Workout_API.Controllers
             return Ok(workouts);
         }
 
-        [HttpGet("getById/{id}")]
+        [HttpGet("getById/{id}", Name = "GetWorkoutById")]
         public IActionResult GetById(int Id)
         {
             Workout? workout = null;
@@ -54,11 +54,21 @@ namespace Workout_API.Controllers
         {
             using(_context)
             {
+                User? user = _context.Users.SingleOrDefault(u => u.Id == newWorkout.User.Id || u.Email == newWorkout.User.Email);
+
+                if(user == null)
+                {
+                    return BadRequest("Provided user does not exist");
+
+                }
+
+                newWorkout.User = user;
+
                 _context.Workouts.Add(newWorkout);
                 _context.SaveChanges();
             }
 
-            return CreatedAtRoute("GetWorkout", new { newWorkout.Id }, newWorkout);
+            return CreatedAtRoute("GetWorkoutById", new { newWorkout.Id }, newWorkout);
         }
     }
 }
