@@ -28,8 +28,8 @@ namespace Workout_API.Controllers
             return Ok(workouts);
         }
 
-        [HttpGet("getById/{id}", Name = "GetWorkoutById")]
-        public IActionResult GetById(int Id)
+        [HttpGet("{Id}", Name = "GetWorkoutById")]
+        public IActionResult GetWorkoutById(int Id)
         {
             Workout? workout = HandleGetWorkout(Id);
 
