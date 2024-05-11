@@ -19,15 +19,12 @@ namespace Workout_API.Controllers
         public IActionResult Get()
         {
             List<Workout> workouts = new List<Workout>();
-            using (_context)
+            if (!_context.Workouts.Any())
             {
-                if(!_context.Workouts.Any())
-                {
-                    return NoContent();
-                }
-
-                workouts = _context.Workouts.ToList();
+                return NoContent();
             }
+
+            workouts = _context.Workouts.ToList();
 
             return Ok(workouts);
         }
@@ -36,10 +33,7 @@ namespace Workout_API.Controllers
         public IActionResult GetById(int Id)
         {
             Workout? workout = null;
-            using (_context)
-            {
-                workout = _context.Workouts.SingleOrDefault(u => u.Id == Id);
-            }
+            workout = _context.Workouts.SingleOrDefault(u => u.Id == Id);
 
             if (workout == null)
             {
@@ -52,21 +46,18 @@ namespace Workout_API.Controllers
         [HttpPost(Name = "CreateWorkout")]
         public IActionResult CreateWorkout([FromBody] Workout newWorkout)
         {
-            using(_context)
+            User? user = _context.Users.SingleOrDefault(u => u.Id == newWorkout.User.Id || u.Email == newWorkout.User.Email);
+
+            if (user == null)
             {
-                User? user = _context.Users.SingleOrDefault(u => u.Id == newWorkout.User.Id || u.Email == newWorkout.User.Email);
+                return BadRequest("Provided user does not exist");
 
-                if(user == null)
-                {
-                    return BadRequest("Provided user does not exist");
-
-                }
-
-                newWorkout.User = user;
-
-                _context.Workouts.Add(newWorkout);
-                _context.SaveChanges();
             }
+
+            newWorkout.User = user;
+
+            _context.Workouts.Add(newWorkout);
+            _context.SaveChanges();
 
             return CreatedAtRoute("GetWorkoutById", new { newWorkout.Id }, newWorkout);
         }

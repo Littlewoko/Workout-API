@@ -95,11 +95,8 @@ namespace Workout_API.Controllers
         /// <returns>User instance or null</returns>
         private User? HandleGetUser(string Email)
         {
-            using (_context)
-            {
-                User? user = _context.Users.SingleOrDefault(u => u.Email == Email);
-                return user;
-            }
+            User? user = _context.Users.SingleOrDefault(u => u.Email == Email);
+            return user;
         }
 
         /// <param name="user"></param>
@@ -125,40 +122,31 @@ namespace Workout_API.Controllers
         /// <exception cref="InvalidOperationException">If user already exists with email</exception>
         private void HandleCreateUser(User newUser)
         {
-            using (_context)
+            User? user = _context.Users.SingleOrDefault(u => u.Email == newUser.Email);
+            if (user != null)
             {
-                User? user = _context.Users.SingleOrDefault(u => u.Email == newUser.Email);
-                if (user != null)
-                {
-                    throw new InvalidOperationException("A user is already associated with that email");
-                }
-
-                _context.Users.Add(newUser);
-                _context.SaveChanges();
+                throw new InvalidOperationException("A user is already associated with that email");
             }
+
+            _context.Users.Add(newUser);
+            _context.SaveChanges();
         }
 
         private void HandleUpdateUser(User updatedUser)
         {
-            using (_context)
-            {
-                _context.Users.Update(updatedUser);
-                _context.SaveChanges();
-            }
+            _context.Users.Update(updatedUser);
+            _context.SaveChanges();
         }
 
         /// <param name="Email"></param>
         private void HandleDeleteUser(string Email)
         {
-            using (_context)
-            {
-                User? user = _context.Users.SingleOrDefault(u => u.Email == Email);
+            User? user = _context.Users.SingleOrDefault(u => u.Email == Email);
 
-                if (user != null)
-                {
-                    _context.Users.Remove(user);
-                    _context.SaveChanges();
-                }
+            if (user != null)
+            {
+                _context.Users.Remove(user);
+                _context.SaveChanges();
             }
         }
     }
