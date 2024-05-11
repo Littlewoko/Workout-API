@@ -52,7 +52,6 @@ namespace Workout_API.Models
         /// </summary>
         public int OrderStep { get; set; }
 
-        public int MovementId { get; set; }
         public Movement Movement { get; set; }  
     }
 }

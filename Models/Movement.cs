@@ -28,7 +28,6 @@ namespace Workout_API.Models
 
         public int OrderStep { get; set; }
 
-        public int WorkoutId { get; set; }
         public Workout Workout { get; set; }
     }
 }

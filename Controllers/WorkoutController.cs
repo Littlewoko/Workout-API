@@ -5,6 +5,8 @@ using Workout_API.Models;
 
 namespace Workout_API.Controllers
 {
+    [ApiController]
+    [Route("[controller]")]
     public class WorkoutController : Controller
     {
         private DBContext _context;
@@ -13,8 +15,25 @@ namespace Workout_API.Controllers
             _context = context;
         }
 
-        [HttpGet(Name = "GetWorkout")]
-        public IActionResult Get(int Id)
+        [HttpGet(Name = "GetAllWorkouts")]
+        public IActionResult Get()
+        {
+            List<Workout> workouts = new List<Workout>();
+            using (_context)
+            {
+                if(!_context.Workouts.Any())
+                {
+                    return NoContent();
+                }
+
+                workouts = _context.Workouts.ToList();
+            }
+
+            return Ok(workouts);
+        }
+
+        [HttpGet("getById/{id}")]
+        public IActionResult GetById(int Id)
         {
             Workout? workout = null;
             using (_context)
