@@ -23,7 +23,14 @@ namespace Workout_API.Controllers
         [HttpGet(Name = "GetUser")]
         public IActionResult Get(string Email)
         {
-            User? user = HandleGetUser(Email);
+            User? user = null;
+            try
+            {
+                user = HandleGetUser(Email);
+            } catch(Exception _)
+            {
+                return StatusCode(500);
+            }
 
             if (user == null)
                 return NotFound();
@@ -62,6 +69,8 @@ namespace Workout_API.Controllers
             return Ok();
         }
 
+        /// <param name="Email"></param>
+        /// <returns>User instance or null</returns>
         private User? HandleGetUser(string Email)
         {
             using (_context)
@@ -90,6 +99,8 @@ namespace Workout_API.Controllers
             }
         }
 
+        /// <param name="newUser"></param>
+        /// <exception cref="InvalidOperationException">If user already exists with email</exception>
         private void HandleCreateUser(User newUser)
         {
             using (_context)
@@ -105,6 +116,7 @@ namespace Workout_API.Controllers
             }
         }
 
+        /// <param name="Email"></param>
         private void HandleDeleteUser(string Email)
         {
             using (_context)
