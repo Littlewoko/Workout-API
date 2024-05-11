@@ -27,7 +27,8 @@ namespace Workout_API.Controllers
             try
             {
                 user = HandleGetUser(Email);
-            } catch(Exception _)
+            }
+            catch (Exception _)
             {
                 return StatusCode(500);
             }
@@ -52,6 +53,27 @@ namespace Workout_API.Controllers
             }
 
             return CreatedAtRoute("GetUser", new { newUser.Email }, newUser);
+        }
+
+        [HttpPut(Name = "UpdateUser")]
+        public IActionResult UpdateUser([FromBody] User updatedUser)
+        {
+            try
+            {
+                HandleValidateUser(updatedUser);
+
+                User? user = HandleGetUser(updatedUser.Email);
+                if (user == null)
+                    throw new InvalidOperationException("The user you have attampted to update does not exist");
+                else
+                    HandleUpdateUser(updatedUser);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            return Ok();
         }
 
         [HttpDelete(Name = "DeleteUserByEmail")]
@@ -112,6 +134,15 @@ namespace Workout_API.Controllers
                 }
 
                 _context.Users.Add(newUser);
+                _context.SaveChanges();
+            }
+        }
+
+        private void HandleUpdateUser(User updatedUser)
+        {
+            using (_context)
+            {
+                _context.Users.Update(updatedUser);
                 _context.SaveChanges();
             }
         }
