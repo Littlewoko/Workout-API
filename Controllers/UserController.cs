@@ -56,6 +56,12 @@ namespace Workout_API.Controllers
 
             using (_context)
             {
+                User? user = _context.Users.SingleOrDefault(u => u.Email == newUser.Email);
+                if(user != null)
+                {
+                    return BadRequest("A user is already associated with that email");
+                }
+
                 _context.Users.Add(newUser);
                 _context.SaveChanges();
             }
