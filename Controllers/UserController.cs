@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -22,16 +23,10 @@ namespace Workout_API.Controllers
         [HttpGet(Name = "GetUser")]
         public IActionResult Get(string Email)
         {
-            User? user = null;
-            using (_context)
-            {
-                user = _context.Users.SingleOrDefault(u => u.Email == Email);
-            }
+            User? user = HandleGetUser(Email);
 
             if (user == null)
-            {
                 return NotFound();
-            }
 
             return Ok(user);
         }
@@ -39,31 +34,14 @@ namespace Workout_API.Controllers
         [HttpPost(Name = "CreateUser")]
         public IActionResult CreateUser([FromBody] User newUser)
         {
-            if(newUser.Name.IsNullOrEmpty())
+            try
             {
-                return BadRequest("User name is must be present");
+                HandleValidateUser(newUser);
+                HandleCreateUser(newUser);
             }
-
-            
-            string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
-            Regex validate = new Regex(emailPattern);
-            bool validEmail = validate.IsMatch(newUser.Email);
-
-            if (!validEmail)
+            catch (InvalidOperationException ex)
             {
-                return BadRequest("Invalid email provided for user");
-            }
-
-            using (_context)
-            {
-                User? user = _context.Users.SingleOrDefault(u => u.Email == newUser.Email);
-                if(user != null)
-                {
-                    return BadRequest("A user is already associated with that email");
-                }
-
-                _context.Users.Add(newUser);
-                _context.SaveChanges();
+                return BadRequest(ex.Message);
             }
 
             return CreatedAtRoute("GetUser", new { newUser.Email }, newUser);
@@ -71,6 +49,63 @@ namespace Workout_API.Controllers
 
         [HttpDelete(Name = "DeleteUserByEmail")]
         public IActionResult DeleteUserByEmail(string Email)
+        {
+            try
+            {
+                HandleDeleteUser(Email);
+            }
+            catch (Exception _)
+            {
+                return StatusCode(500);
+            }
+
+            return Ok();
+        }
+
+        private User? HandleGetUser(string Email)
+        {
+            using (_context)
+            {
+                User? user = _context.Users.SingleOrDefault(u => u.Email == Email);
+                return user;
+            }
+        }
+
+        /// <param name="user"></param>
+        /// <returns>Error string or empty string when valid</returns>
+        private void HandleValidateUser(User user)
+        {
+            if (user.Name.IsNullOrEmpty())
+            {
+                throw new InvalidOperationException("User name is must be present");
+            }
+
+            string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+            Regex validate = new Regex(emailPattern);
+            bool validEmail = validate.IsMatch(user.Email);
+
+            if (!validEmail)
+            {
+                throw new InvalidOperationException("Invalid email provided for user");
+            }
+        }
+
+        private void HandleCreateUser(User newUser)
+        {
+            using (_context)
+            {
+                User? user = _context.Users.SingleOrDefault(u => u.Email == newUser.Email);
+                if (user != null)
+                {
+                    throw new InvalidOperationException("A user is already associated with that email");
+                }
+
+                _context.Users.Add(newUser);
+                _context.SaveChanges();
+            }
+        }
+
+        private void HandleDeleteUser(string Email)
         {
             using (_context)
             {
@@ -82,28 +117,6 @@ namespace Workout_API.Controllers
                     _context.SaveChanges();
                 }
             }
-
-            return Ok();
         }
-
-        /*
-         * Swagger won't allow two delete methods (look into?)
-         */
-        //[HttpDelete(Name = "DeleteUserById")]
-        //public IActionResult DeleteUserById(int Id)
-        //{
-        //    using(_context)
-        //    {
-        //        User user = _context.Users.Single(u => u.Id == Id);
-
-        //        if (user != null)
-        //        {
-        //            _context.Users.Remove(user);
-        //            _context.SaveChanges();
-        //        }
-        //    }
-
-        //    return Ok();
-        //}
     }
 }
