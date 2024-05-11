@@ -66,7 +66,7 @@ namespace Workout_API.Controllers
                 if (user == null)
                     throw new InvalidOperationException("The user you have attampted to update does not exist");
                 else
-                    HandleUpdateUser(updatedUser);
+                    HandleUpdateUser(user, updatedUser);
             }
             catch (InvalidOperationException ex)
             {
@@ -81,9 +81,10 @@ namespace Workout_API.Controllers
         {
             try
             {
-                HandleDeleteUser(Email);
+                User? user = HandleGetUser(Email);
+                HandleDeleteUser(user);
             }
-            catch (Exception _)
+            catch (Exception)
             {
                 return StatusCode(500);
             }
@@ -132,17 +133,18 @@ namespace Workout_API.Controllers
             _context.SaveChanges();
         }
 
-        private void HandleUpdateUser(User updatedUser)
+        /// <param name="user">Existing record in database</param>
+        /// <param name="updatedUser">Record containing updated fields</param>
+        private void HandleUpdateUser(User user, User updatedUser)
         {
-            _context.Users.Update(updatedUser);
+            user.Name = updatedUser.Name;
+            
             _context.SaveChanges();
         }
 
         /// <param name="Email"></param>
-        private void HandleDeleteUser(string Email)
+        private void HandleDeleteUser(User? user)
         {
-            User? user = _context.Users.SingleOrDefault(u => u.Email == Email);
-
             if (user != null)
             {
                 _context.Users.Remove(user);
