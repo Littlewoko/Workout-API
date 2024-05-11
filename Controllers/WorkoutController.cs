@@ -63,6 +63,27 @@ namespace Workout_API.Controllers
             return CreatedAtRoute("GetWorkoutById", new { newWorkout.Id }, newWorkout);
         }
 
+        [HttpPut(Name = "UpdateWorkout")]
+        public IActionResult UpdateWorkout(Workout updatedWorkout)
+        {
+            try
+            {
+                Workout? workout = HandleGetWorkout(updatedWorkout.Id);
+                if (workout == null)
+                    throw new InvalidOperationException("The workout you have attempted to update does not exist");
+                else
+                    HandleUpdateWorkout(workout, updatedWorkout);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+            return Ok();
+
+            return Ok();
+        }
+
         [HttpDelete(Name = "DeleteWorkout")]
         public IActionResult DeleteWorkout(int Id)
         {
@@ -94,6 +115,15 @@ namespace Workout_API.Controllers
         private void HandleCreateWorkout(Workout newWorkout)
         {
             _context.Workouts.Add(newWorkout);
+            _context.SaveChanges();
+        }
+
+        /// <param name="workout">Existing record in database</param>
+        /// <param name="updatedWorkout">Record containing updated fields</param>
+        private void HandleUpdateWorkout(Workout workout, Workout updatedWorkout)
+        {
+            workout.Date = updatedWorkout.Date;
+
             _context.SaveChanges();
         }
 
