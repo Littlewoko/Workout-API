@@ -55,12 +55,28 @@ namespace Workout_API.Controllers
                 newWorkout.User = user; // ensure FK constraints are properly put in place
                 HandleCreateWorkout(newWorkout);
             }
-            catch (Exception _)
+            catch (Exception)
             {
                 return StatusCode(500);
             }
 
             return CreatedAtRoute("GetWorkoutById", new { newWorkout.Id }, newWorkout);
+        }
+
+        [HttpDelete(Name = "DeleteWorkout")]
+        public IActionResult DeleteWorkout(int Id)
+        {
+            try
+            {
+                Workout? workout = HandleGetWorkout(Id);
+                HandleDeleteWorkout(workout);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500);
+            }
+
+            return Ok();
         }
 
         private Workout? HandleGetWorkout(int Id)
@@ -79,6 +95,15 @@ namespace Workout_API.Controllers
         {
             _context.Workouts.Add(newWorkout);
             _context.SaveChanges();
+        }
+
+        private void HandleDeleteWorkout(Workout? workout)
+        {
+            if(workout != null)
+            {
+                _context.Workouts.Remove(workout);
+                _context.SaveChanges();
+            }
         }
     }
 }

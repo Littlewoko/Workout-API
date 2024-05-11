@@ -28,7 +28,7 @@ namespace Workout_API.Controllers
             {
                 user = HandleGetUser(Email);
             }
-            catch (Exception _)
+            catch (Exception)
             {
                 return StatusCode(500);
             }
