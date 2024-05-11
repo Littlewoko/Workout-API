@@ -21,20 +21,21 @@ namespace Workout_API.Controllers
         [HttpGet(Name = "GetUser")]
         public IActionResult Get(string Email)
         {
-            User user = null;
+            User? user = null;
             using (_context)
             {
-                user = _context.Users.Single(u => u.Email == Email);
+                if (_context.Users.Any())
+                {
+                    user = _context.Users.SingleOrDefault(u => u.Email == Email);
+                }
             }
 
             if (user == null)
             {
                 return NotFound();
             }
-            else
-            {
-                return Ok(user);
-            }
+
+            return Ok(user);
         }
 
         [HttpPost(Name = "CreateUser")]
@@ -49,40 +50,50 @@ namespace Workout_API.Controllers
                 return BadRequest("Invalid email provided for user");
             }
 
-            _context.Users.Add(newUser);
-            _context.SaveChanges();
-
-            return CreatedAtRoute("GetUser", new { Email = newUser.Email }, newUser);
-        }
-
-        [HttpPost(Name = "DeleteUserByEmail")]
-        public IActionResult DeleteUser(string Email)
-        {
-            User user = _context.Users.Single(u => u.Email == Email);
-
-            if (user == null)
+            using (_context)
             {
-                return Ok();
+                _context.Users.Add(newUser);
+                _context.SaveChanges();
             }
 
-            _context.Users.Remove(user);
-            _context.SaveChanges();
+            return CreatedAtRoute("GetUser", new { newUser.Email }, newUser);
+        }
+
+        [HttpDelete(Name = "DeleteUserByEmail")]
+        public IActionResult DeleteUserByEmail(string Email)
+        {
+            using (_context)
+            {
+                User user = _context.Users.Single(u => u.Email == Email);
+
+                if (user != null)
+                {
+                    _context.Users.Remove(user);
+                    _context.SaveChanges();
+                }
+            }
+
             return Ok();
         }
 
-        [HttpPost(Name = "DeleteUserById")]
-        public IActionResult DeleteUser(int Id)
-        {
-            User user = _context.Users.Single(u => u.Id == Id);
+        /*
+         * Swagger won't allow two delete methods (look into?)
+         */
+        //[HttpDelete(Name = "DeleteUserById")]
+        //public IActionResult DeleteUserById(int Id)
+        //{
+        //    using(_context)
+        //    {
+        //        User user = _context.Users.Single(u => u.Id == Id);
 
-            if (user == null)
-            {
-                return Ok();
-            }
+        //        if (user != null)
+        //        {
+        //            _context.Users.Remove(user);
+        //            _context.SaveChanges();
+        //        }
+        //    }
 
-            _context.Users.Remove(user);
-            _context.SaveChanges();
-            return Ok();
-        }
+        //    return Ok();
+        //}
     }
 }
