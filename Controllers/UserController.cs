@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System.Text.RegularExpressions;
 using Workout_API.DBContexts;
 using Workout_API.Models;
@@ -24,10 +25,7 @@ namespace Workout_API.Controllers
             User? user = null;
             using (_context)
             {
-                if (_context.Users.Any())
-                {
-                    user = _context.Users.SingleOrDefault(u => u.Email == Email);
-                }
+                user = _context.Users.SingleOrDefault(u => u.Email == Email);
             }
 
             if (user == null)
@@ -41,6 +39,12 @@ namespace Workout_API.Controllers
         [HttpPost(Name = "CreateUser")]
         public IActionResult CreateUser([FromBody] User newUser)
         {
+            if(newUser.Name.IsNullOrEmpty())
+            {
+                return BadRequest("User name is must be present");
+            }
+
+            
             string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
             Regex validate = new Regex(emailPattern);
             bool validEmail = validate.IsMatch(newUser.Email);
@@ -64,7 +68,7 @@ namespace Workout_API.Controllers
         {
             using (_context)
             {
-                User user = _context.Users.Single(u => u.Email == Email);
+                User? user = _context.Users.SingleOrDefault(u => u.Email == Email);
 
                 if (user != null)
                 {
