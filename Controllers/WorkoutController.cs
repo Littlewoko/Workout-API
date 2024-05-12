@@ -17,7 +17,7 @@ namespace Workout_API.Controllers
         }
 
         [HttpGet(Name = "GetAllWorkouts")]
-        public IActionResult Get()
+        public IActionResult Get() // todo: should only return a given users workouts
         {
             if (!_context.Workouts.Any())
             {
@@ -28,6 +28,9 @@ namespace Workout_API.Controllers
 
             return Ok(workouts);
         }
+
+        // todo: get all of a users workouts within a given date range
+
 
         [HttpGet("{Id}", Name = "GetWorkoutById")]
         public IActionResult GetWorkoutById(int Id)
