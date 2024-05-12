@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using Workout_API.DBContexts;
 using Workout_API.Models;
+using Workout_API.Utils;
 
 namespace Workout_API.Controllers
 {
@@ -46,7 +47,7 @@ namespace Workout_API.Controllers
         {
             try
             {
-                User? user = HandleGetUser(newWorkout.User.Email, newWorkout.User.Id);
+                User? user = UserUtils.HandleGetUser(_context, newWorkout.User.Email, newWorkout.User.Id);
                 if (user == null)
                 {
                     return BadRequest("Provided user does not exist");
@@ -103,13 +104,6 @@ namespace Workout_API.Controllers
         private Workout? HandleGetWorkout(int Id)
         {
             return _context.Workouts.SingleOrDefault(u => u.Id == Id);
-        }
-
-        /// <param name="Email"></param>
-        /// <returns>User instance or null</returns>
-        private User? HandleGetUser(string Email, int Id)
-        {
-            return _context.Users.SingleOrDefault(u => u.Id == Id || u.Email == Email);
         }
 
         private void HandleCreateWorkout(Workout newWorkout)

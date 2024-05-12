@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text.RegularExpressions;
 using Workout_API.DBContexts;
 using Workout_API.Models;
+using Workout_API.Utils;
 
 namespace Workout_API.Controllers
 {
@@ -81,7 +82,7 @@ namespace Workout_API.Controllers
         {
             try
             {
-                User? user = HandleGetUser(Email);
+                User? user = UserUtils.HandleGetUser(_context, Email);
                 HandleDeleteUser(user);
             }
             catch (Exception)
@@ -90,14 +91,6 @@ namespace Workout_API.Controllers
             }
 
             return Ok();
-        }
-
-        /// <param name="Email"></param>
-        /// <returns>User instance or null</returns>
-        private User? HandleGetUser(string Email)
-        {
-            User? user = _context.Users.SingleOrDefault(u => u.Email == Email);
-            return user;
         }
 
         /// <param name="user"></param>
