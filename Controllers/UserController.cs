@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text.RegularExpressions;
 using Workout_API.DBContexts;
+using Workout_API.DTO;
 using Workout_API.Models;
 using Workout_API.Utils;
 
@@ -24,57 +25,59 @@ namespace Workout_API.Controllers
         [HttpGet(Name = "GetUser")]
         public IActionResult Get(string Email)
         {
-            User? user = null;
             try
             {
-                user = UserUtils.HandleGetUser(_context, Email);
-            }
-            catch (Exception)
-            {
-                return StatusCode(500);
-            }
+                User? user = UserUtils.HandleGetUser(_context, Email);
 
-            if (user == null)
-                return NotFound();
+                if (user == null)
+                {
+                    return NotFound();
+                }
 
-            return Ok(user);
-        }
+                return Ok(user);
 
-        [HttpPost(Name = "CreateUser")]
-        public IActionResult CreateUser([FromBody] User newUser)
-        {
-            try
-            {
-                HandleValidateUser(newUser);
-                HandleCreateUser(newUser);
             }
-            catch (InvalidOperationException ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-
-            return CreatedAtRoute("GetUser", new { newUser.Email }, newUser);
         }
 
-        [HttpPut(Name = "UpdateUser")]
-        public IActionResult UpdateUser([FromBody] User updatedUser)
+        [HttpPost(Name = "CreateUser")]
+        public IActionResult CreateUser([FromBody] UserTransferObject _newUser)
         {
             try
             {
-                HandleValidateUser(updatedUser);
+                User newUser = _newUser.ToUser();
+                HandleCreateUser(newUser);
+                return CreatedAtRoute("GetUser", new { newUser.Email }, newUser);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut(Name = "UpdateUser")]
+        public IActionResult UpdateUser([FromBody] UserTransferObject _updatedUser)
+        {
+            try
+            {
+                User updatedUser = _updatedUser.ToUser();
 
                 User? user = UserUtils.HandleGetUser(_context, updatedUser.Email);
                 if (user == null)
                     throw new InvalidOperationException("The user you have attempted to update does not exist");
                 else
                     HandleUpdateUser(user, updatedUser);
+
+                return Ok();
+
             }
             catch (InvalidOperationException ex)
             {
                 return BadRequest(ex.Message);
             }
-
-            return Ok();
         }
 
         [HttpDelete(Name = "DeleteUserByEmail")]
@@ -84,29 +87,11 @@ namespace Workout_API.Controllers
             {
                 User? user = UserUtils.HandleGetUser(_context, Email);
                 HandleDeleteUser(user);
+                return Ok();
             }
             catch (Exception)
             {
                 return StatusCode(500);
-            }
-
-            return Ok();
-        }
-
-        private static void HandleValidateUser(User user)
-        {
-            if (user.Name.IsNullOrEmpty())
-            {
-                throw new InvalidOperationException("User name is must be present");
-            }
-
-            string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
-            Regex validate = new Regex(emailPattern);
-            bool validEmail = validate.IsMatch(user.Email);
-
-            if (!validEmail)
-            {
-                throw new InvalidOperationException("Invalid email provided for user");
             }
         }
 
