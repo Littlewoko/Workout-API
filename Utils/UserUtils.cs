@@ -1,26 +1,28 @@
-﻿using Workout_API.DBContexts;
+﻿using System.Text.RegularExpressions;
+using Workout_API.DBContexts;
 using Workout_API.Models;
 
 namespace Workout_API.Utils
 {
     public static class UserUtils
     {
-        /// <param name="_context"></param>
-        /// <param name="Email"></param>
-        /// <param name="Id"></param>
-        /// <returns>User instance or null</returns>
         public static User? HandleGetUser(DBContext _context, string Email, int Id)
         {
             return _context.Users.SingleOrDefault(u => u.Id == Id && u.Email == Email);
         }
 
-        /// <param name="_context"></param>
-        /// <param name="Email"></param>
-        /// <param name="Id"></param>
-        /// <returns>User instance or null</returns>
         public static User? HandleGetUser(DBContext _context, string Email)
         {
             return _context.Users.SingleOrDefault(u => u.Email == Email);
+        }
+
+        public static bool ValidateEmail(string Email)
+        {
+            string emailPattern = @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$";
+            Regex validate = new Regex(emailPattern);
+            bool validEmail = validate.IsMatch(Email);
+
+            return validEmail;
         }
     }
 }
