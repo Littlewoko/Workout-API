@@ -14,6 +14,8 @@ namespace Workout_API
 
             var app = builder.Build();
             ConfigureApp(app);
+
+            app.Run();
         }
 
         private static void ConfigureBuilder(WebApplicationBuilder builder)
@@ -34,20 +36,20 @@ namespace Workout_API
 
         private static void ConfigureApp(WebApplication app)
         {
+            SetupSwagger(app);
+
+            app.UseHttpsRedirection();
+            app.UseAuthorization();
+            app.MapControllers();
+        }
+
+        private static void SetupSwagger(WebApplication app)
+        {
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
-
-            app.MapControllers();
-
-            app.Run();
         }
     }
 }
