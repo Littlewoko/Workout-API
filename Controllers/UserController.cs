@@ -65,7 +65,7 @@ namespace Workout_API.Controllers
 
                 User? user = UserUtils.HandleGetUser(_context, updatedUser.Email);
                 if (user == null)
-                    throw new InvalidOperationException("The user you have attampted to update does not exist");
+                    throw new InvalidOperationException("The user you have attempted to update does not exist");
                 else
                     HandleUpdateUser(user, updatedUser);
             }
