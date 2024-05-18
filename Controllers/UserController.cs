@@ -93,9 +93,7 @@ namespace Workout_API.Controllers
             return Ok();
         }
 
-        /// <param name="user"></param>
-        /// <returns>Error string or empty string when valid</returns>
-        private void HandleValidateUser(User user)
+        private static void HandleValidateUser(User user)
         {
             if (user.Name.IsNullOrEmpty())
             {
@@ -112,8 +110,6 @@ namespace Workout_API.Controllers
             }
         }
 
-        /// <param name="newUser"></param>
-        /// <exception cref="InvalidOperationException">If user already exists with email</exception>
         private void HandleCreateUser(User newUser)
         {
             User? user = _context.Users.SingleOrDefault(u => u.Email == newUser.Email);
@@ -126,8 +122,6 @@ namespace Workout_API.Controllers
             _context.SaveChanges();
         }
 
-        /// <param name="user">Existing record in database</param>
-        /// <param name="updatedUser">Record containing updated fields</param>
         private void HandleUpdateUser(User user, User updatedUser)
         {
             user.Name = updatedUser.Name;
@@ -135,7 +129,6 @@ namespace Workout_API.Controllers
             _context.SaveChanges();
         }
 
-        /// <param name="Email"></param>
         private void HandleDeleteUser(User? user)
         {
             if (user != null)
